@@ -1,14 +1,14 @@
 // DOCUMENTED
 import { useProjectWindow } from '@magickml/client-core'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useModal } from '../../contexts/ModalProvider'
 import { usePubSub } from '../../../../core/client/src/providers/PubSubProvider'
+import { useModal } from '../../contexts/ModalProvider'
 import { toggleAutoSave } from '../../state/preferences'
 import { RootState } from '../../state/store'
-import { activeTabSelector, changeEditorLayout, Tab } from '../../state/tabs'
+import { Tab, activeTabSelector, changeEditorLayout } from '../../state/tabs'
 import css from './menuBar.module.css'
 
 /**
@@ -54,21 +54,7 @@ const MenuBar = () => {
     TOGGLE_SNAP,
   } = events
 
-  /**
-   * Custom hook for toggling state value between true and false
-   *
-   * @param {boolean} initialValue
-   * @returns {[boolean, () => void]}
-   */
-  const useToggle = (initialValue = false) => {
-    const [value, setValue] = useState(initialValue)
-    const toggle = useCallback(() => {
-      setValue(v => !v)
-    }, [])
-    return [value, toggle as () => void]
-  }
-
-  const [menuVisibility, toggleMenuVisibility] = useToggle()
+  const [menuVisibility, setMenuVisibility] = useState<boolean>(false)
 
   /**
    * Save handler
@@ -481,7 +467,7 @@ const MenuBar = () => {
   const handleClick = (func: () => void) => {
     // Initially intended to control the visibility with a state, but this triggers a re-render and hides the menu anyway! :D
     // Keeping this intact just in case.
-    toggleMenuVisibility(menuVisibility)
+    setMenuVisibility(!menuVisibility)
     // No need for this
     // func()
   }

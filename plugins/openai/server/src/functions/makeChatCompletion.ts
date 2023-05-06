@@ -2,7 +2,6 @@
 import {
   ChatMessage,
   CompletionHandlerInputData,
-  Event,
   saveRequest
 } from '@magickml/core'
 import axios from 'axios'
@@ -15,16 +14,12 @@ import { OPENAI_ENDPOINT } from '../constants'
  */
 export async function makeChatCompletion(
   data: CompletionHandlerInputData
-): Promise<{ success: boolean, result?: string | null, error?: string | null }> {
+): Promise<{
+  success: boolean
+  result?: string | null
+  error?: string | null
+}> {
   const { node, inputs, context } = data
-
-  // Filter out undefined input keys from inputs
-  const inputKeys = Object.values(inputs).filter((input: any) => {
-    return Object.values(input).filter(Boolean).length > 0
-  })[0]
-
-  // Get the first non-empty Event as inputData
-  const inputData = (inputKeys as Event[]).filter(Boolean)[0] as Event
 
   // Get the system message and conversation inputs
   const system = inputs['system']?.[0] as string
@@ -33,10 +28,14 @@ export async function makeChatCompletion(
   // Get or set default settings
   const settings = {
     model: node?.data?.model,
-    temperature: parseFloat(node?.data?.temperature as string ?? "0.0"),
-    top_p: parseFloat(node?.data?.top_p as string ?? "1.0"),
-    frequency_penalty: parseFloat(node?.data?.frequency_penalty as string ?? "0.0"),
-    presence_penalty: parseFloat(node?.data?.presence_penalty as string ?? "0.0"),
+    temperature: parseFloat((node?.data?.temperature as string) ?? '0.0'),
+    top_p: parseFloat((node?.data?.top_p as string) ?? '1.0'),
+    frequency_penalty: parseFloat(
+      (node?.data?.frequency_penalty as string) ?? '0.0'
+    ),
+    presence_penalty: parseFloat(
+      (node?.data?.presence_penalty as string) ?? '0.0'
+    ),
   } as any
 
   // Initialize conversationMessages array
@@ -44,7 +43,10 @@ export async function makeChatCompletion(
 
   // Add elements to conversationMessages
   conversation?.forEach(event => {
-    const message = { role: event.observer === inputData.observer ? 'assistant' : 'user', content: event.content }
+    const message = {
+      role: event.observer === event.sender ? 'assistant' : 'user',
+      content: event.content,
+    }
     conversationMessages.push(message)
   })
 

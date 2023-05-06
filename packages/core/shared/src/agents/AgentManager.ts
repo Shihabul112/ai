@@ -86,11 +86,13 @@ export class AgentManager {
    * Update agent instances.
    */
   async updateAgents() {
-    this.newAgents = (await this.app.service('agents').find({
-      query: {
-        enabled: true,
-      },
-    }))?.data
+    this.newAgents = (
+      await this.app.service('agents').find({
+        query: {
+          enabled: true,
+        },
+      })
+    )?.data
     if (!this.newAgents) return
 
     await this.deleteOldAgents()

@@ -22,7 +22,6 @@ const info = `The TaskInput component allows you to receive data from the task r
 
 type InputReturn = {
   output: unknown
-  objective: string
   agentTask: AgentTask
 }
 
@@ -40,7 +39,6 @@ export class TaskInput extends MagickComponent<InputReturn> {
         outputs: {
           output: 'output',
           agentTask: 'output',
-          objective: 'output',
           trigger: 'option',
         },
       },
@@ -64,15 +62,16 @@ export class TaskInput extends MagickComponent<InputReturn> {
    * @returns {MagickNode} - The configured node
    */
   builder(node: MagickNode) {
+    node.data.name = node.data.name || 'Input - Task'
     const taskType = new InputControl({
       dataKey: 'taskType',
       name: 'Task Type',
       icon: 'moon',
-      defaultValue: 'agi',
+      defaultValue: 'task',
     })
 
     taskType.onData = data => {
-      node.data.name = `Input - Task(${data})`
+      node.data.name = `Input - Task`
     }
 
     // Set isInput to true so we can identify this node as an input node
@@ -84,7 +83,7 @@ export class TaskInput extends MagickComponent<InputReturn> {
     // Set the default name if there is none
     if (!node.data.name) {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      node.data.name ?? `Input - Task (${node.data.taskType})`
+      node.data.name ?? `Input - Task`
     }
 
     node.inspector.add(taskType)
@@ -93,7 +92,6 @@ export class TaskInput extends MagickComponent<InputReturn> {
     node.addOutput(new Rete.Output('output', 'Event', eventSocket))
     node.addOutput(new Rete.Output('trigger', 'Trigger', triggerSocket))
     node.addOutput(new Rete.Output('agentTask', 'Task', taskSocket))
-    node.addOutput(new Rete.Output('objective', 'Objective', anySocket))
 
     return node
   }
@@ -133,7 +131,6 @@ export class TaskInput extends MagickComponent<InputReturn> {
     return {
       output,
       agentTask,
-      objective: agentTask.objective,
     }
   }
 }
